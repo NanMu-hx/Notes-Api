@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # 1. 你的 Web API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"  # 外部访问端口 5000
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+    networks:
+      - app-network
+
+  # 2. MySQL 8 数据库
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456       # root 密码
+      MYSQL_DATABASE: notes_db          # 自动创建数据库
+    volumes:
+      - mysql-data:/var/lib/mysql       # 数据持久化
+    restart: always
+    networks:
+      - app-network
+
+  # 3. Redis 7 缓存
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+    networks:
+      - app-network
+
+# 共享网络，让三个容器互相访问
+networks:
+  app-network:
+    driver: bridge
+
+# 数据卷（保存 MySQL + Redis 数据，删容器不丢数据）
+volumes:
+  mysql-data:
+  redis-data:

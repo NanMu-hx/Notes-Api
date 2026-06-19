@@ -1,0 +1,6 @@
+@first_net8._0_HostAddress = http://localhost:5267
+
+GET {{first_net8._0_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
