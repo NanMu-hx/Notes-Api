@@ -98,5 +98,26 @@ namespace first_net8._0.Controllers
             await _redisCache.DeleteAsync(GetCacheKey());
             return Ok("修改成功，缓存已清除");
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNote(int id)
+        {
+            // 1. 先获取声明值并做空校验
+            var userIdStr = User.FindFirstValue("UserId");
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+            {
+                return Unauthorized(new { msg = "用户未授权，请重新登录" });
+            }
+
+            var note = await _db.Notes.FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+            if (note == null)
+            {
+                return NotFound(new { msg = "笔记不存在或无权限删除" });
+            }
+
+            _db.Notes.Remove(note);
+            await _db.SaveChangesAsync();
+            return Ok(new { msg = "删除成功" });
+        }
     }
 }
