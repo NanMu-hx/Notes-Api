@@ -1,11 +1,13 @@
-using first_net8._0.Data;  // 引用 AppDbContext
 using first_net8._0;
+using first_net8._0.Data;  // 引用 AppDbContext
+using first_net8._0.Services.Implements;
+using first_net8._0.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;  // EF Core 核心命名空间
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 using StackExchange.Redis;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +81,10 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 
 // 3. 注册自定义Redis缓存服务（Scoped：每个请求独立实例）
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+
+// 注册业务层服务
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<INoteService, NoteService>();
 
 
 // 3. 配置JWT认证
